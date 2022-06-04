@@ -146,6 +146,51 @@
                               "build": "webpack --config ./Config/webpack-prod.js"
                           },
         -- 这样我们运行指令时候，直接输入 npm start 这样就启动开发模式的指令；如果运行生产环境，就输入： npm run build
+     14. 生产模式的配置： 
+        - 处理 CSS 文件成单独文件
+          -- CSS文件目前被打包到js 文件中，当js文件加载时候，会创建一个style标签来生成样式
+          -- 这样对于网站来说会出现闪屏现象，用户体验不好，我们应该提取出单独的CSS文件，然后link到我们的网页中才好
+          -- 下载包： 
+              npm install mini-css-extract-plugin -D
+          -- 修改配置文件： 
+              {
+                test:/\.css$/i,
+                use:[
+                  MiniCssExtractPlugin.loader,"css-loaer'
+                ]
+              }
+          -- 插件部分 用 new 创建一次；  new MiniCssExtractPlugin()
+          -- 最后运行指令： npm run build 这样输出文件中就有一个 main.css ， 是把所有的css 文件打包输出到这一个css 文件中；可以指定文件目录和名称:
+               new MiniCssExtractPlugin({
+                                            filename: './css/main.css'
+                                                })
+          - CSS 兼容性处理： 一般使用 postcss-loader 去处理，详情看官方文档，现在IE 不用了，兼容性好很多了.
+      15. 封装样式loader函数
+        - webpack 的config 配置 js 里有很多重复代码，可以集合起来封装成一个loader函数，这样每次调用就好了；
+            function getStyleloader(pre){
+              return [
+                MiniCssExtractPlugin.loader,// 提取css成单独文件
+                "css-loader",
+                {
+                  loader:"postcss-loader",
+                  options:{
+                    postcssOptions:{
+                      plugins:[
+                        "postcss-preset-env",// 能解决大多数样式兼容性问题
+                      ]
+                    }
+                  }
+                },
+               pre,
+              ].filter(Boolean)
+            }
+      16. CSS 压缩： 使用插件： CssMinimizerWebpackPlugin; 
+          下载包依赖，config.js中引入， 最后 plugin 中 new 方法调用，然后 npm  run build 检查输出结果；
+      17. html 和 js 的压缩： 默认生产模式已经开启，html 和 js 文件不需要额外压缩，自动压缩；
+
+              
+
+
         
                                   
             
