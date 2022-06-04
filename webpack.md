@@ -18,3 +18,121 @@
    4. 看到 绿色的 successfully 就是编译成功了
    5. 打包完成的文件会保存在 dist 目录中，这样编译好的main.js 就可以被网页浏览器引入识别，注意是 dist 目录下的入口文件 main.js， 这是编译好的入口文件。
    6. 测试生产环境，只要改成： --mode = production 就好; 生产环境会对代码进行压缩；
+ - 基本配置：5大核心概念
+   1. 入口：（entry) 提示 webpack从哪个文件开始打包
+   2. 输出： output 只是webpack打包玩的文件输出到哪里去，如何命名等；
+   3. 加载器 （loader) webpack 本身只能处理 js json 等资源，其他资源需要借助 loader， webpack 才能处理这些资源
+   4. plugins （插件）： 扩展webpack功能
+   5. mode (模式) 开发模式和生产模式
+   6. 配置文件： webpack.config.js 一定要位于根目录下; webpack.config.js是在node 环境下运行的，所以里面的模块化语法都是 common js 的 例如： module.export ={}
+   7. 配置文件设置好之后，可以直接执行命令： npx webpack  这样它就会去目录下寻找 webpack.config.js 文件，读取配置文件后，开始根据配置文件要求去打包；
+ - 开发模式介绍：
+   1. 开发模式顾名思义就是我们开发代码时候使用的模式
+   2. 此模式下，我们的主要两个任务：
+      - 编译代码，使浏览器能识别运行
+         开发时候， 我们有样式资源，字体图标，图片资源，html资源，webpack默认都不能处理这些资源，所以我们需要加载配置来编译这些资源
+      - 代码质量检测，树立代码规范；
+        提前检查代码的一些隐患，让代码运行时更加健壮； 提前检查代码规范和格式，统一团队编码风格，让代码更加美观。
+ - 处理样式资源： 
+    1. 处理CSS资源： 
+      - 下载包
+        npm i css-loader style-loader -D 或者：npm install --save-dev css-loader
+        
+      - 引入css 文件，在入口文件中 import 需要编译的 css 文件
+      - 在 webpack 配置文件中 webpack.config.js 中， 修改rules{}, 可以查官方文档： 需要哪些loader 就下载哪些；
+            {
+                test: /\.css$/i, // 检测筛查文件，只检测.css结尾的文件
+                use: [
+                        "style-loader", // 将 js 中的 css 通过 创建 style 标签添加到 html中让样式生效；
+                        "css-loader" // 可以将css 资源编译成 common js 模块到 入口文件的 js 中；
+                    ] // use 的执行顺序：从右到左，或者从下到上；
+            },
+         
+    2. 处理 less 资源： less 是一种css 的预处理器；其他类似的预处理器还有 saas 和 stylus
+      - 下载包
+        下载 less 和 less-loader: 
+        npm install less less-loader --save-dev
+      - 更新 webpack.config.js 的 less 配置；
+
+       {
+          test: /\.less$/i, // 检测筛查文件，只检测.css结尾的文件
+                use: [
+            "style-loader", // 将 js 中的 css 通过 创建 style 标签添加到 html中让样式生效；
+            "css-loader", // 可以将css 资源编译成 common js 模块到 入口文件的 js 中；
+            "less-loader" // 可以将 less资源编译成 common js 模块到 入口文件的 js 中；
+                    ] // use 的执行顺序：从右到左，或者从下到上；
+            }
+    3. 处理 sass 资源
+      - 方法同上，可以看官方文档下载包和配置 webpack.config.js
+    4. 处理图片资源
+      - 在webpack.config.js里添加图片配置： 利用正则选择所有后缀是 .png,jpeg,jpg gif 和 webq 的图片文件
+         {
+           test: /\.(png|jpe?g|gif|webp)$/, 
+           type:"asset"
+         }
+      - 因为图片处理方法已经内置到了 webpack 中，不需要再安装下载loader, 所以可以直接打包： npx webpack
+      - 针对较小的图片，可以转化成 base64 格式 来优化图片；可以搜索官方文件去调用；
+          parser:{
+            <!-- 小于10kb 的图片转化格式 -->
+            dataUrlCondition:{
+              <!-- 转换优点： 减少请求数量，缺点：转换后的体积会变得大一点  -->
+              maxSize:10*1024
+            }
+          }
+    5. 修改输出文件的目录：打包后输出的文件进入响应的目录，比如 js --> js. css-->css
+     - 注意打包之后，不会删除dist 之前的内容，如果更新，要删除之前的内容，重新打包；
+     - 配置输出文件的路径和文件名： 
+         generator: {
+                    //生成输出图片的目录和文件名
+                    filename: "static/images/[hash:10][ext][query]" // [hash:10] 表示只取哈希值的前10位
+                }
+
+    6. 自动清空上次打包内容；
+      - 只需要在 output 属性下加入 clea 子属性： 原理是打包前，将 path 整个目录内容清空；
+                output: {
+                  // 文件输出路径：
+                  //  __dirname  是 node.js 的变量，代表当前文件夹目录
+                  path: path.resolve(__dirname, "dist"), // 绝对路径, 找到dist 文件夹； 
+                  // 入口文件打包输出的文件名
+                  filename: "static/js/main.js", // 这样打包后，main.js 入口文件就会保存在 dist/static/js 目录下，其他资源还是输出到 path 目录下；
+                  clean: true // 设置每次打包前清空上次的打包输出内容
+              },
+    7. 处理字体图标资源： 一般直接远程CDN 引入，除非下载下来再去引用打包；
+
+    8. 处理其他资源： 音视频，excel 等： 
+        {
+          test:/\.(ttf|woff2?|mp3|mp4|avi)$/,
+          type:"asset/resource",
+          generator:{
+            <!-- 输出路径和名称 -->
+            filename:"media/[hash:10][ext][query]"
+          }
+
+        }
+    9. 处理js 资源， 
+      - 原因： 
+        webpack 对js 处理是有限的，只能编译js 中的 es 模块化语法，不能编译其他语法，导致js不能在IE 等浏览器运行，不过IE 已经被放弃了，不学也罢；
+      - 小知识： babel 可以将ES6语法编写的代码编译成向后兼容的 JS 语法，以便能够运行在IE 或者旧版本的浏览器；
+    10. 处理 html 资源；
+      - 需求：
+        让HTML自动引入打包后的资源；不用现在手动引入打包完的 bundler
+      - 使用插件 plugins 来自动引入打包完的文件： 
+        下载 引入 直接用： npm install --save-dev html-webpack-plugin
+      - 下载完毕后，进入 webpack.config.js， 首先引入，然后去 plugin 部分，设置配置 
+                  plugins: [
+                //  plugin 的配置
+                new HtmlWebpackPlugin() // 设置插件 html-webpack-plugin
+         ]
+      - 控制台直接运行 npx webpack
+    11. 开发服务器和自动化
+      - 每次写完代码，都要手动输入指令才能编译代码，这样太麻烦了，我们希望一切自动化： 
+         -- 下载包： npm i webpack-dev-server -D
+         -- webpack-dev-server 服务器会自动监视我们src 目录下的原文件改动，如果发现改动，则会自动重新打包，
+         -- 下载完这个包后，去到 webpack-config.js 文件下进行配置： 
+         -- 启动了 webpack-dev-server后，我们的打包指令需要变成： npx webpack serve
+         -- 注意，webpack-dev-server 不会输出打包后的文件，是在内存中编译打包的，开发模式下是没有任何输出的，只是会在浏览器里有效果；
+    12. 总结开发模式下配置： 
+        entry; output; module; plugins; devServer; mode;
+
+   
+

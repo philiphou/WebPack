@@ -1,0 +1,25 @@
+.container {
+    width: 350px;
+    display: flex;
+}
+
+.box1 {
+    width: 100px;
+    height: 100px;
+    background-image: url('../image/1200px-RedTulip.jpg');
+    background-size: cover;
+}
+
+.box2 {
+    width: 100px;
+    height: 100px;
+    background-image: url('../image/37000295.jpg');
+    background-size: cover;
+}
+
+.box3 {
+    width: 100px;
+    height: 100px;
+    background-image: url('../image/76271.jpg');
+    background-size: cover;
+}
