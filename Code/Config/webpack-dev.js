@@ -7,8 +7,8 @@ module.exports = {
     // 输出：
     output: {
         // 文件输出路径：
-        //  __dirname  是 node.js 的变量，代表当前文件夹目录
-        path: path.resolve(__dirname, "dist"), // 绝对路径, 找到dist 文件夹； 
+        //  __dirname  是 node.js 的变量，代表当前文件夹目录 path.resolve(__dirName,"../dist")
+        path: undefined, // 因为开发模式下 没有输出 不需要path
         // 入口文件打包输出的文件名
         filename: "js/main.js", // 这样打包后，main.js 入口文件就会保存在 dist/static/js 目录下，其他资源还是输出到 path 目录下；
         clean: true // 设置每次打包前清空上次的打包输出内容
@@ -59,7 +59,7 @@ module.exports = {
             // 设置插件 html-webpack-plugin, 并且传入的参数是为了保证 打包成的新的 html文件保留我们之前写入的所有结构；
             //  打包成的新的html 文件特点： 1. 结构和以前一致，2. 会自动引入打包的资源；
             //  以后要运行的文件就直接用打包输出的新的 Html 文件
-            template: path.resolve(__dirname, "public/index.html")
+            template: path.resolve(__dirname, "../public/index.html")
 
         })
     ],

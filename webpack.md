@@ -133,6 +133,23 @@
          -- 注意，webpack-dev-server 不会输出打包后的文件，是在内存中编译打包的，开发模式下是没有任何输出的，只是会在浏览器里有效果；
     12. 总结开发模式下配置： 
         entry; output; module; plugins; devServer; mode;
+    13. 生产模式： 
+        -- 把 webpack-dev.js 和 webpack-prod.js 两个配置文件放到新建文件夹： config 中，
+        -- 终端运行： npx webpack serve --config ./config/webpack-dev.js
+        -- 注意修改配置文件中的绝对路径，需要 ../进入上一级目录
+        -- 生产模式下，打包后是需要有输出文件的。配置文件 webpack.prod.js 中的mode 要改为： production 模式， 生产模式不再需要 webpack-dev-server,只需要打包文件输出就好。
+        -- 终端输入命令： npx webpack --config ./Config/webpack-prod.js
+        -- 为了缩短指令写法，我们去package.json 文件中找到 script 属性，定义并添加两个指令，一个是指定 dev 表示开发模式：一个是build 表示生产模式： 
+              "scripts": {    
+                              "start": "npm run dev",
+                              "dev": "webpack serve --config ./Config/webpack-dev.js",
+                              "build": "webpack --config ./Config/webpack-prod.js"
+                          },
+        -- 这样我们运行指令时候，直接输入 npm start 这样就启动开发模式的指令；如果运行生产环境，就输入： npm run build
+        
+                                  
+            
+
 
    
 
